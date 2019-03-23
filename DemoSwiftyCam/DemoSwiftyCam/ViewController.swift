@@ -35,7 +35,29 @@ class ViewController: SwiftyCamViewController, SwiftyCamViewControllerDelegate {
         flashButton.setImage(#imageLiteral(resourceName: "flashauto"), for: UIControl.State())
         captureButton.buttonEnabled = false
 	}
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+    
+    }
 
+    override func configureCustomVideoOutput() -> Bool {
+        let videoDataOutput = AVCaptureVideoDataOutput()
+        guard let pixelFormat = (videoDataOutput.availableVideoPixelFormatTypes.map { NSNumber(value: $0) }).first else {
+            return false
+        }
+        videoDataOutput.alwaysDiscardsLateVideoFrames = true
+        let queue = DispatchQueue(label: "com.shu223.videosamplequeue")
+        videoDataOutput.setSampleBufferDelegate(self, queue: queue)
+        videoDataOutput.videoSettings = [String(kCVPixelBufferPixelFormatTypeKey): pixelFormat]
+        if session.canAddOutput(videoDataOutput) {
+            session.addOutput(videoDataOutput)
+            return true
+        }
+        return false
+    }
+    
 	override var prefersStatusBarHidden: Bool {
 		return true
 	}
@@ -166,3 +188,9 @@ extension ViewController {
     }
 }
 
+extension ViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
+    
+    func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+        debugPrint(sampleBuffer)
+    }
+}

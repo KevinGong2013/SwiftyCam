@@ -657,11 +657,18 @@ open class SwiftyCamViewController: UIViewController {
 		configureVideoPreset()
 		addVideoInput()
 		addAudioInput()
-		configureVideoOutput()
+        if !configureCustomVideoOutput() {
+            configureVideoOutput()
+        }
+		
 		configurePhotoOutput()
 
 		session.commitConfiguration()
 	}
+    
+    open func configureCustomVideoOutput() -> Bool {
+        return false
+    }
 
 	/// Add inputs after changing camera()
 
